@@ -1,1 +1,1 @@
-# notepadReact
+# Notepad creado por Daniel Sosa usando React + Vite.
