@@ -1,14 +1,24 @@
 import { useState } from 'react';
-import "../componentescss/navbar.css";
+import "../componentescss/navbar.css"; // Ensure this path is correct
+import { Link } from 'react-router-dom'; // Import Link from react-router-dom
 
-function CustomNavbar({ botones, rutaIcono, titulo }) {
+// We now accept 'userName' as a prop
+function CustomNavbar({ botones, rutaIcono, titulo, userName }) {
   return (
     <nav className="navbar">
-      <a href='/' className='logo'>
-        <img src={rutaIcono}></img>
+      <Link to='/' className='logo'> {/* Use Link instead of <a> for internal navigation */}
+        <img src={rutaIcono} alt="App Icon"></img> {/* Add alt attribute for accessibility */}
         <p className='logo-title'> {titulo} </p>
-      </a>
+      </Link>
+
       <ul className="ul">
+        {/* Render the welcome message if userName exists */}
+        {userName && (
+          <li className="li welcome-message-container">
+            <span className="welcome-text">¡Hola, {userName}!</span>
+          </li>
+        )}
+
         {botones.map((boton, index) => (
           <BotonNavbar key={index} boton={boton} />
         ))}
@@ -29,6 +39,10 @@ function BotonNavbar({ boton }) {
   };
 
   const handleClick = () => {
+    // Check if it's a route, then use Link for internal navigation (best practice)
+    // For now, keeping window.location.href as in your original for simplicity,
+    // but typically you'd use useNavigate from react-router-dom here if this component
+    // is part of the Router context, or pass a navigate function down.
     if (boton.ruta) {
       window.location.href = boton.ruta;
     }
@@ -37,9 +51,7 @@ function BotonNavbar({ boton }) {
     }
   };
 
-  const colorTexto = boton.colorTexto || 'black'; // Establece el blanco como valor por defecto
-
-  
+  const colorTexto = boton.colorTexto || 'black';
 
   return (
     <li className="li">
@@ -51,7 +63,7 @@ function BotonNavbar({ boton }) {
         <button
           onClick={handleClick}
           className="button"
-          style={{ color: colorTexto }} // Aplica el estilo de color desde la variable
+          style={{ color: colorTexto }}
         >
           {boton.texto}
           <div className={`hover-box ${isMouseOver ? 'show' : ''}`}></div>

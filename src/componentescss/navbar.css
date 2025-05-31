@@ -12,6 +12,7 @@
   padding: 0;
   margin: 0;
   display: flex;
+  align-items: center;
 }
 
 .li {
@@ -82,5 +83,18 @@
   font-family: 'Courier New', Courier, monospace;
   margin: 0;
   padding: 10px;
-  color: inherit; /* Asegura que el título también herede el color */
+  color: inherit;
+}
+
+.welcome-message-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.welcome-text {
+  color: #000000;
+  font-weight: bold;
+  white-space: nowrap;
+  padding-right: 30px;
 }

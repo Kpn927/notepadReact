@@ -1,0 +1,149 @@
+/* login.css */
+
+.login-form {
+    background-color: #ffffff;
+    padding: 45px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-left: 520px;
+    margin-top: 100px;
+}
+
+.login-form .form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.login-form label {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+    font-size: 1rem;
+}
+
+.login-form .form-control {
+    padding: 12px 15px;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: #555;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.login-form .form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    outline: none;
+}
+
+.login-form .btn-primary {
+    background-color: #007bff;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    margin-top: 10px;
+}
+
+.login-form .btn-primary:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.login-form .btn-primary:active {
+    background-color: #004085;
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+.login-form .btn-secondary {
+    background-color: #e9ecef;
+    color: #495057;
+    padding: 12px 20px;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    margin-top: 5px;
+}
+
+.login-form .btn-secondary:hover {
+    background-color: #dee2e6;
+    color: #343a40;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.login-form .btn-secondary:active {
+    background-color: #c6cfd8;
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+/* --- REVISED LOGO STYLES FOR .login-logo --- */
+/* Matches the height and auto-width of your provided .logo class */
+.login-logo {
+    height: 40px; /* Set fixed height as requested */
+    width: auto; /* Let width adjust proportionally */
+    display: inline-block; /* Allows it to be horizontally centered by parent's text-align */
+    vertical-align: middle; 
+  
+}
+
+/* Container to center the logo and provide spacing */
+.login-logo-container {
+    text-align: center; /* Centers the image horizontally */
+    margin-bottom: 25px; /* Adds space below the logo */
+}
+
+/* Optional: Hover effect for the logo */
+.login-logo:hover {
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+}
+
+/* Add this to componentescss/login.css */
+
+.password-group {
+  position: relative; /* Allows absolute positioning of children */
+}
+
+.password-group .form-control {
+  padding-right: 60px; /* Make space for the button inside the input */
+}
+
+.toggle-password-visibility {
+  position: absolute;
+  right: 10px; /* Adjust as needed for spacing from the right edge */
+  top: 60%; /* Center vertically */
+  transform: translateY(-50%); /* Adjust for perfect vertical centering */
+  background: none;
+  border: none;
+  color: #007bff; /* Or any color that fits your theme */
+  cursor: pointer;
+  font-size: 0.85em; /* Make it small */
+  padding: 5px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.toggle-password-visibility:hover {
+  background-color: rgba(0, 123, 255, 0.1); /* Light hover effect */
+}
+
+.toggle-password-visibility:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
