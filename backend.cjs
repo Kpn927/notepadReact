@@ -3,7 +3,6 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const { Pool } = require('pg');
 const path = require('path');
-const { resourceLimits } = require('worker_threads');
 require('dotenv').config({ path: path.resolve(__dirname, './process.env') });
 
 const app = express();
@@ -74,9 +73,6 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
-// app.post('/api/login', async (req, res) => {
-// ... (your existing imports and setup)
-
 app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
 
@@ -100,7 +96,7 @@ app.post('/api/login', async (req, res) => {
         }
 
         console.log('Usuario logueado exitosamente:', user.users_us);
-        res.status(200).json({ message: 'Login exitoso!', username: user.users_us }); // <--- MODIFIED LINE
+        res.status(200).json({ message: 'Login exitoso!', username: user.users_us });
 
     } catch (error) {
         console.error('Error del servidor durante el login:', error);

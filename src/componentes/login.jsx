@@ -1,4 +1,3 @@
-// src/components/LoginForm.js
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { FaEye, FaEyeSlash } from 'react-icons/fa6';
@@ -39,7 +38,6 @@ export default function LoginForm({ registerPath = '/register', homePath = '/', 
                   onLoginSuccess(data.username);
               }
               console.log('Login completado!', data);
-              // navigate(homePath); // <--- Make sure this line is GONE from Login.jsx
 
           } else {
               setError(data.message || 'Login fallido. Por favor revisa tus credenciales.');
@@ -56,7 +54,6 @@ export default function LoginForm({ registerPath = '/register', homePath = '/', 
     navigate(registerPath);
   };
 
-  // Function to toggle password visibility
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };

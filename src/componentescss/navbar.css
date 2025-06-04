@@ -1,10 +1,11 @@
 .navbar {
-  background-color: #f0f0f0;
+  background-color: #e2e2e2;
   padding: 20px 20px;
   border-radius: 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  border: 5px solid black;
 }
 
 .ul {
@@ -96,5 +97,5 @@
   color: #000000;
   font-weight: bold;
   white-space: nowrap;
-  padding-right: 30px;
+  padding-right: 610px;
 }

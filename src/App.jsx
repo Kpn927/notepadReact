@@ -1,37 +1,52 @@
 import { useState, useEffect } from 'react';
-import { Routes, Route, BrowserRouter, useLocation, useNavigate } from 'react-router-dom';
+import { Routes, Route, BrowserRouter, useLocation, useNavigate, Link } from 'react-router-dom';
 import './App.css';
 import CustomNavbar from './componentes/navbar.jsx';
 import Login from './componentes/login.jsx';
 import Register from './componentes/register.jsx';
 import LineaPorLinea from './componentes/superimportantcomponent.jsx';
 
-// NO necesitas importar el TXT aquí directamente si lo vas a cargar con fetch
-// import beemovieScript from './beemoviescript.txt'; // <-- ELIMINA O COMENTA ESTA LÍNEA
-
-const HomePage = () => (
-  <div className="p-6">
-    <h1 className="text-2xl font-bold mb-4">Página de Inicio</h1>
-    <p>¡Bienvenido a la Página de Inicio!</p>
+const HomePage = ({ isLoggedIn, userName }) => (
+  <div className="home">
+    <div className='welcometext'>
+      {isLoggedIn ? (
+        <>
+          <h2>¡Bienvenido, {userName} a Kyu's Notepad!</h2>
+          <p>Es hora de organizar tus ideas. <Link to="/notas" className="link-action">Ir a tus notas</Link></p>
+        </>
+      ) : (
+        <>
+          <h2>¡Bienvenido a Kyu's Notepad!</h2>
+          <p>Organiza tus ideas con facilidad. Por favor, <Link to="/register" className="link-action">regístrate</Link> o <Link to="/login" className="link-action">inicia sesión</Link> para continuar.</p>
+        </>
+      )}
+    </div>
   </div>
 );
 
 const LoginPage = ({ onLoginSuccess }) => (
-  <div className="p-6">
+  <div className="login">
     <Login registerPath="/register" onLoginSuccess={onLoginSuccess} />
   </div>
 );
 
 const RegisterPage = () => (
-  <div className="p-6">
+  <div className="register">
     <Register loginPath="/login" homePath="/" />
   </div>
 );
 
 const NotFoundPage = () => (
-    <div className="p-6">
-        <h1 className="text-2xl font-bold mb-4">404 No Encontrado</h1>
+    <div className="notfound">
+        <h1>404 No Encontrado</h1>
         <p>Lo siento, la página que buscas no existe.</p>
+    </div>
+);
+
+const NotesPage = () => (
+    <div className="notes">
+      <h2>Mis Notas</h2>
+      <p>Aquí es donde irán tus notas.</p>
     </div>
 );
 
@@ -48,9 +63,9 @@ const AppContent = () => {
         return localStorage.getItem('userName') || '';
     });
 
-    const hideNavbar = location.pathname === '/login' || 
-    location.pathname === '/register' || 
-    location.pathname === '/random';
+    const hideNavbar = location.pathname === '/login' ||
+                       location.pathname === '/register' ||
+                       location.pathname === '/random';
 
     const [beemovieScriptContent, setBeemovieScriptContent] = useState('');
     const [loadingScript, setLoadingScript] = useState(true);
@@ -59,10 +74,9 @@ const AppContent = () => {
     useEffect(() => {
         const fetchScript = async () => {
             try {
-
                 const response = await fetch('/beemoviescript.txt');
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    throw new Error(`HTTP Error! estado: ${response.status}`);
                 }
                 const text = await response.text();
                 setBeemovieScriptContent(text);
@@ -75,7 +89,7 @@ const AppContent = () => {
         };
 
         fetchScript();
-    }, []); // El array vacío asegura que se ejecute solo una vez al montar
+    }, []);
 
     const handleLoginSuccess = (username) => {
         setIsLoggedIn(true);
@@ -101,6 +115,7 @@ const AppContent = () => {
     ];
 
     if (isLoggedIn) {
+        botonesNavbar.push({ texto: 'Notas', ruta: '/notas', CNBoton: '', colorTexto: '' });
         botonesNavbar.push({ texto: 'Cerrar sesión', onClick: handleLogout, CNBoton: 'boton-logout', colorTexto: 'red'});
     } else {
         botonesNavbar.push(
@@ -109,36 +124,35 @@ const AppContent = () => {
         );
     }
 
-    // Define qué contenido mostrar en la ruta /random
     let randomElementContent;
     if (loadingScript) {
       randomElementContent = <p>Cargando script de Bee Movie...</p>;
     } else if (scriptError) {
       randomElementContent = <p className="text-red-500">{scriptError}</p>;
     } else {
-      // Pasa el contenido cargado asíncronamente
       randomElementContent = <LineaPorLinea texto={beemovieScriptContent} />;
     }
 
     return (
         <>
-            {!hideNavbar && (
-                <CustomNavbar
-                    botones={botonesNavbar}
-                    titulo="Kyu's Notepad"
-                    rutaIcono="/notepad.svg"
-                    userName={isLoggedIn ? userName : null}
-                />
-            )}
-            <main>
+          <div className="main-app-container">
+                {!hideNavbar && (
+                    <CustomNavbar
+                        botones={botonesNavbar}
+                        titulo="Kyu's Notepad"
+                        rutaIcono="/notepad.svg"
+                        userName={isLoggedIn ? userName : null}
+                    />
+                )}
                 <Routes>
-                    <Route path="/" element={<HomePage />} />
+                    <Route path="/" element={<HomePage isLoggedIn={isLoggedIn} userName={userName} />} />
+                    <Route path='/notas' element={<NotesPage />} />
                     <Route path="/login" element={<LoginPage onLoginSuccess={handleLoginSuccess} />} />
                     <Route path="/register" element={<RegisterPage />} />
                     <Route path="/random" element={randomElementContent} />
                     <Route path="*" element={<NotFoundPage />} />
                 </Routes>
-            </main>
+          </div>
         </>
     );
 }
@@ -146,9 +160,7 @@ const AppContent = () => {
 function App() {
   return (
     <BrowserRouter>
-      <div>
-        <AppContent />
-      </div>
+      <AppContent />
     </BrowserRouter>
   );
 }
