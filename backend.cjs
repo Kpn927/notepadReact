@@ -96,10 +96,65 @@ app.post('/api/login', async (req, res) => {
         }
 
         console.log('Usuario logueado exitosamente:', user.users_us);
-        res.status(200).json({ message: 'Login exitoso!', username: user.users_us });
+        res.status(200).json({ message: 'Login exitoso!', userid: user.users_id, username: user.users_us });
 
     } catch (error) {
         console.error('Error del servidor durante el login:', error);
         res.status(500).json({ message: 'Error interno del servidor durante el login.' });
+    }
+});
+
+app.post('/api/notes', async (req, res) => {
+    const { content, user_id } = req.body;
+    console.log('Datos recibidos para agregar nota:', { content, user_id });
+
+    if (!content || content.trim() === '') {
+        console.error('Error al agregar nota: El contenido de la nota no puede estar vacío.');
+        return res.status(400).json({ message: 'El contenido de la nota no puede estar vacío.' });
+    }
+
+    if (!user_id) {
+        console.error('Error al agregar nota: El ID de usuario es requerido.');
+        return res.status(400).json({ message: 'El ID de usuario es requerido.' });
+    }
+
+    try {
+        const result = await pool.query(
+            'INSERT INTO notas (notas_ct, user_id) VALUES ($1, $2) RETURNING notas_ct AS content, user_id, notas_id',
+            [content, user_id]
+        );
+
+        const newNote = result.rows[0];
+
+        res.status(201).json(newNote);
+
+    } catch (error) {
+        console.error('Error al agregar nota:', error);
+        res.status(500).json({ message: 'Error interno del servidor al agregar nota.' });
+    }
+});
+
+app.get('/api/notes', async (req, res) => {
+    const { userId } = req.query;
+
+    if (!userId) {
+      console.error('Error al obtener notas: El ID de usuario es requerido como parámetro de consulta (userId).');
+      return res.status(400).json({ message: 'El ID de usuario es requerido.' });
+    }
+    
+    try {
+      const result = await pool.query('SELECT * FROM notas WHERE user_id = $1', [userId]);
+
+      const notes = result.rows.map(row => ({
+        content: row.notas_ct,
+        user_id: row.user_id
+      }));
+      
+      console.log('Solicitud para obtener notas para el UserID:', userId);
+      res.status(200).json(notes);
+
+    } catch (error) {
+        console.error('Error al obtener notas:', error);
+        res.status(500).json({ message: 'Error interno del servidor al obtener notas.' });
     }
 });

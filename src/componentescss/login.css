@@ -24,8 +24,8 @@
     font-size: 1rem;
 }
 
-.form-control input {
-    width: 92%;
+.login-form label {
+    font-family: 'monocraft', monospace;
 }
 
 .login-form .form-control {
@@ -35,7 +35,8 @@
     font-size: 1rem;
     color: #555;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    width: 92%;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .login-form .form-control:focus {
@@ -55,6 +56,7 @@
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
     margin-top: 10px;
+    font-family: 'monocraft', monospace;
 }
 
 .login-form .btn-primary:hover {
@@ -70,8 +72,8 @@
 }
 
 .login-form .btn-secondary {
-    background-color: #e9ecef;
-    color: #495057;
+    background-color: #5a6268;
+    color: #ffffff;
     padding: 12px 20px;
     border: 1px solid #ced4da;
     border-radius: 8px;
@@ -80,6 +82,7 @@
     cursor: pointer;
     transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
     margin-top: 5px;
+    font-family: 'monocraft', monospace;
 }
 
 .login-form .btn-secondary:hover {
@@ -99,8 +102,7 @@
     height: 40px;
     width: auto;
     display: inline-block;
-    vertical-align: middle; 
-  
+    vertical-align: middle;
 }
 
 .login-logo-container {
@@ -114,33 +116,51 @@
 }
 
 .password-group {
-  position: relative;
+    position: relative;
+    display: flex;
+    align-items: center;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    padding: 0;
 }
 
 .password-group .form-control {
-  padding-right: 60px;
+    flex-grow: 1;
+    border: none;
+    padding: 8px 15px;
+    outline: none;
+    box-shadow: none;
+}
+
+.password-group .form-control:focus {
+    border-color: transparent;
+    box-shadow: none; 
+}
+
+.password-group:focus-within {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
 
 .toggle-password-visibility {
-  position: absolute;
-  right: 10px;
-  top: 60%;
-  transform: translateY(-50%); 
-  background: none;
-  border: none;
-  color: #007bff;
-  cursor: pointer;
-  font-size: 0.85em;
-  padding: 5px;
-  border-radius: 4px;
-  transition: background-color 0.2s ease;
+    background: none;
+    border: none;
+    color: #007bff;
+    cursor: pointer;
+    font-size: 1.1em;
+    padding: 0 15px 0 0;
+    height: 60%; 
+    display: flex;
+    align-items: center;
+    justify-content: center; 
+    transition: background-color 0.2s ease;
 }
 
 .toggle-password-visibility:hover {
-  background-color: rgba(0, 123, 255, 0.1);
+    background-color: rgba(0, 123, 255, 0.1);
 }
 
 .toggle-password-visibility:disabled {
-  cursor: not-allowed;
-  opacity: 0.6;
+    cursor: not-allowed;
+    opacity: 0.6;
 }

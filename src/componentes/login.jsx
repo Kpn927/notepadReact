@@ -30,12 +30,16 @@ export default function LoginForm({ registerPath = '/register', homePath = '/', 
 
           if (response.ok) {
               localStorage.setItem('isLoggedIn', 'true');
+              if (data.userid) {
+                  localStorage.setItem('userId', data.userid);
+              }
+
               if (data.username) {
                   localStorage.setItem('userName', data.username);
               }
 
               if (onLoginSuccess) {
-                  onLoginSuccess(data.username);
+                  onLoginSuccess(data.userid, data.username);
               }
               console.log('Login completado!', data);
 

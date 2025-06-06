@@ -5,35 +5,37 @@ import CustomNavbar from './componentes/navbar.jsx';
 import Login from './componentes/login.jsx';
 import Register from './componentes/register.jsx';
 import LineaPorLinea from './componentes/superimportantcomponent.jsx';
+import NotesManager from './componentes/notes.jsx';
 
-const HomePage = ({ isLoggedIn, userName }) => (
-  <div className="home">
-    <div className='welcometext'>
-      {isLoggedIn ? (
-        <>
-          <h2>¡Bienvenido, {userName} a Kyu's Notepad!</h2>
-          <p>Es hora de organizar tus ideas. <Link to="/notas" className="link-action">Ir a tus notas</Link></p>
-        </>
-      ) : (
-        <>
-          <h2>¡Bienvenido a Kyu's Notepad!</h2>
-          <p>Organiza tus ideas con facilidad. Por favor, <Link to="/register" className="link-action">regístrate</Link> o <Link to="/login" className="link-action">inicia sesión</Link> para continuar.</p>
-        </>
-      )}
+// HomePage now relies only on isLoggedIn status, not username for display
+const HomePage = ({ isLoggedIn }) => (
+    <div className="home">
+        <div className='welcometext'>
+            {isLoggedIn ? (
+                <>
+                    <h2>¡Bienvenido a Kyu's Notepad!</h2>
+                    <p>Es hora de organizar tus ideas. <Link to="/notas" className="link-action">Ir a tus notas</Link></p>
+                </>
+            ) : (
+                <>
+                    <h2>¡Bienvenido a Kyu's Notepad!</h2>
+                    <p>Organiza tus ideas con facilidad. Por favor, <Link to="/register" className="link-action">regístrate</Link> o <Link to="/login" className="link-action">inicia sesión</Link> para continuar.</p>
+                </>
+            )}
+        </div>
     </div>
-  </div>
 );
 
 const LoginPage = ({ onLoginSuccess }) => (
-  <div className="login">
-    <Login registerPath="/register" onLoginSuccess={onLoginSuccess} />
-  </div>
+    <div className="login">
+        <Login registerPath="/register" onLoginSuccess={onLoginSuccess} />
+    </div>
 );
 
 const RegisterPage = () => (
-  <div className="register">
-    <Register loginPath="/login" homePath="/" />
-  </div>
+    <div className="register">
+        <Register loginPath="/login" homePath="/" />
+    </div>
 );
 
 const NotFoundPage = () => (
@@ -45,8 +47,7 @@ const NotFoundPage = () => (
 
 const NotesPage = () => (
     <div className="notes">
-      <h2>Mis Notas</h2>
-      <p>Aquí es donde irán tus notas.</p>
+        <NotesManager />
     </div>
 );
 
@@ -60,12 +61,16 @@ const AppContent = () => {
     });
 
     const [userName, setUserName] = useState(() => {
-        return localStorage.getItem('userName') || '';
+        return localStorage.getItem('username');
+    });
+
+    const [userId, setUserId] = useState(() => {
+        return localStorage.getItem('userId') || '';
     });
 
     const hideNavbar = location.pathname === '/login' ||
-                       location.pathname === '/register' ||
-                       location.pathname === '/random';
+        location.pathname === '/register' ||
+        location.pathname === '/random';
 
     const [beemovieScriptContent, setBeemovieScriptContent] = useState('');
     const [loadingScript, setLoadingScript] = useState(true);
@@ -91,78 +96,83 @@ const AppContent = () => {
         fetchScript();
     }, []);
 
-    const handleLoginSuccess = (username) => {
+    const handleLoginSuccess = (id, userName) => {
         setIsLoggedIn(true);
-        setUserName(username);
+        setUserId(id);
+        setUserName(userName);
         localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('userName', username);
-        console.log('Login completado! Username:', username);
+        localStorage.setItem('userId', id);
+        localStorage.setItem('userName', userName);
+        console.log('Login completado! UserID:', id);
         navigate('/');
     };
 
     const handleLogout = () => {
         setIsLoggedIn(false);
+        setUserId('');
         setUserName('');
         localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('userId');
         localStorage.removeItem('userName');
         console.log('User cerró sesión.');
         navigate('/');
     };
 
     let botonesNavbar = [
-      { texto: 'Inicio', ruta: '/', CNBoton: '', colorTexto: '' },
-      { texto: 'Botónsupermegaimportante', ruta: '/random', CNBoton: '', colorTexto: '' }
+        { texto: 'Inicio', ruta: '/', CNBoton: '', colorTexto: '' },
+        { texto: 'Botónsupermegaimportante', ruta: '/random', CNBoton: '', colorTexto: '' }
     ];
 
     if (isLoggedIn) {
         botonesNavbar.push({ texto: 'Notas', ruta: '/notas', CNBoton: '', colorTexto: '' });
-        botonesNavbar.push({ texto: 'Cerrar sesión', onClick: handleLogout, CNBoton: 'boton-logout', colorTexto: 'red'});
+        botonesNavbar.push({ texto: 'Cerrar sesión', onClick: handleLogout, CNBoton: 'boton-logout', colorTexto: 'red' });
     } else {
         botonesNavbar.push(
-          { texto: 'Iniciar sesión', ruta: '/login', CNBoton: '', colorTexto: '' },
-          { texto: 'Registrarse', ruta: '/register', CNBoton: 'boton-register', colorTexto: 'white' }
+            { texto: 'Iniciar sesión', ruta: '/login', CNBoton: '', colorTexto: '' },
+            { texto: 'Registrarse', ruta: '/register', CNBoton: 'boton-register', colorTexto: 'white' }
         );
     }
 
     let randomElementContent;
     if (loadingScript) {
-      randomElementContent = <p>Cargando script de Bee Movie...</p>;
+        randomElementContent = <p>Cargando script de Bee Movie...</p>;
     } else if (scriptError) {
-      randomElementContent = <p className="text-red-500">{scriptError}</p>;
+        randomElementContent = <p className="text-red-500">{scriptError}</p>;
     } else {
-      randomElementContent = <LineaPorLinea texto={beemovieScriptContent} />;
+        randomElementContent = <LineaPorLinea texto={beemovieScriptContent} />;
     }
 
     return (
         <>
-          <div className="main-app-container">
+            <div className="main-app-container">
                 {!hideNavbar && (
                     <CustomNavbar
                         botones={botonesNavbar}
                         titulo="Kyu's Notepad"
                         rutaIcono="/notepad.svg"
-                        userName={isLoggedIn ? userName : null}
+                        userName={userName}
                     />
                 )}
                 <Routes>
-                    <Route path="/" element={<HomePage isLoggedIn={isLoggedIn} userName={userName} />} />
+                    {/* HomePage now only receives isLoggedIn */}
+                    <Route path="/" element={<HomePage isLoggedIn={isLoggedIn} />} />
                     <Route path='/notas' element={<NotesPage />} />
                     <Route path="/login" element={<LoginPage onLoginSuccess={handleLoginSuccess} />} />
                     <Route path="/register" element={<RegisterPage />} />
                     <Route path="/random" element={randomElementContent} />
                     <Route path="*" element={<NotFoundPage />} />
                 </Routes>
-          </div>
+            </div>
         </>
     );
 }
 
 function App() {
-  return (
-    <BrowserRouter>
-      <AppContent />
-    </BrowserRouter>
-  );
+    return (
+        <BrowserRouter>
+            <AppContent />
+        </BrowserRouter>
+    );
 }
 
 export default App;

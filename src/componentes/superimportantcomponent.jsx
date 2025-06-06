@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import '../componentescss/superimportantcomponent.css';
 
 function LineaPorLinea({ texto }) {
   const allLines = texto.split('\n');
@@ -19,7 +20,7 @@ function LineaPorLinea({ texto }) {
   return (
     <div>
       {linesToDisplay.map((linea, index) => (
-        <h1 key={index}>{linea}</h1>
+        <h1 className='letra_xd' key={index}>{linea}</h1>
       ))}
     </div>
   );

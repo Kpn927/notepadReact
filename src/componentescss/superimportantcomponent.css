@@ -1,0 +1,8 @@
+.letra_xd {
+    font-family: 'monocraft', monospace;
+}
+
+@font-face {
+  font-family: 'monocraft';
+  src: url('/Monocraft.ttc') format('truetype');
+}
