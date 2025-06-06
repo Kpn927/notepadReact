@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 function CustomNavbar({ botones, rutaIcono, titulo, userName }) {
   return (
     <nav className="navbar">
+      {/* Cuando navbar esté en la ruta '/' se desactive el link. */}	
       <Link to='/' className='logo'>
         <img src={rutaIcono} alt="App Icon"></img>
         <p className='logo-title'> {titulo} </p>

@@ -1,7 +1,6 @@
 .navbar {
   background-color: #e2e2e2;
   padding: 20px 20px;
-  border-radius: 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -43,6 +42,7 @@
   color: black;
   font-size: 16px;
   cursor: pointer;
+  font-family: 'monocraft', monospace;
 }
 
 .hover-box {
@@ -81,16 +81,18 @@
 
 .logo-title {
   font-size: 16px;
-  font-family: 'Courier New', Courier, monospace;
+  font-family: 'monocraft', monospace;
   margin: 0;
   padding: 10px;
   color: inherit;
+
 }
 
 .welcome-message-container {
   display: flex;
   align-items: center;
   justify-content: center;
+  font-family: 'monocraft', monospace;
 }
 
 .welcome-text {
@@ -98,4 +100,10 @@
   font-weight: bold;
   white-space: nowrap;
   padding-right: 610px;
+  font-family: 'monocraft', monospace;
+}
+
+@font-face {
+  font-family: 'monocraft';
+  src: url('/Monocraft.ttc') format('truetype');
 }

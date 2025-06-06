@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { FaEye, FaEyeSlash } from 'react-icons/fa6';
 import '../componentescss/register.css';
 
 export default function RegisterForm({ loginPath = '/login', homePath = '/' }) {
@@ -9,6 +10,7 @@ export default function RegisterForm({ loginPath = '/login', homePath = '/' }) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
 
@@ -56,6 +58,10 @@ export default function RegisterForm({ loginPath = '/login', homePath = '/' }) {
     navigate(loginPath);
   };
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
     <form onSubmit={handleSubmit} className="register-form">
       <div className="register-logo-container">
@@ -94,31 +100,40 @@ export default function RegisterForm({ loginPath = '/login', homePath = '/' }) {
       </div>
       <div className="form-group">
         <label htmlFor="registerPassword"></label>
-        <input
-          type="password"
-          id="registerPassword"
-          className="form-control"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder='Crea tu contraseña'
-          required
-          disabled={loading}
-        />
+        <div className="password-wrapper">
+          <input
+            type={showPassword ? 'text' : 'password'}
+            id="registerPassword"
+            className="form-control"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder='Crea tu contraseña'
+            required
+            disabled={loading}
+          />
+          <button type="button" className="toggle-password-visibility" onClick={togglePasswordVisibility} disabled={loading}>
+            {showPassword ? <FaEyeSlash/> : <FaEye/>}
+          </button>
+        </div>
       </div>
       <div className="form-group">
         <label htmlFor="confirmPassword"></label>
-        <input
-          type="password"
-          id="confirmPassword"
-          className="form-control"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          placeholder='Confirma tu contraseña'
-          required
-          disabled={loading}
-        />
+        <div className='password-wrapper'>
+          <input
+            type="password"
+            id="confirmPassword"
+            className="form-control"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            placeholder='Confirma tu contraseña'
+            required
+            disabled={loading}
+          />
+          <button type="button" className="toggle-password-visibility" onClick={togglePasswordVisibility} disabled={loading}>
+            {showPassword ? <FaEyeSlash/> : <FaEye/>}
+          </button>
+        </div>
       </div>
-
       <button type="submit" className="btn btn-primary" disabled={loading}>
         {loading ? 'Registrando...' : 'Registrarse'}
       </button>

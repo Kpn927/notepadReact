@@ -15,6 +15,7 @@
 .register-form .form-group {
     display: flex;
     flex-direction: column;
+    font-family: 'monocraft', monospace;
 }
 
 .register-form label {
@@ -22,6 +23,7 @@
     color: #333;
     margin-bottom: 8px;
     font-size: 1rem;
+    font-family: 'monocraft', monospace;
 }
 
 .register-form .form-control {
@@ -50,6 +52,7 @@
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
     margin-top: 10px;
+    font-family: 'monocraft', monospace;
 }
 
 .register-form .btn-primary:hover {
@@ -75,6 +78,7 @@
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
     margin-top: 5px;
+    font-family: 'monocraft', monospace;
 }
 
 .register-form .btn-secondary:hover {
@@ -105,4 +109,38 @@
 .register-logo:hover {
     opacity: 0.8;
     transition: opacity 0.3s ease;
+}
+
+.form-control {
+    font-family: 'monocraft', monospace;
+}
+
+@font-face {
+  font-family: 'monocraft';
+  src: url('/Monocraft.ttc') format('truetype');
+}
+
+.password-wrapper {position: relative;}
+.toggle-password-visibility {
+  position: absolute;
+  right: 10px;
+  top: 60%;
+  transform: translateY(-50%); 
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  font-size: 0.85em;
+  padding: 5px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.toggle-password-visibility:hover {
+  background-color: rgba(0, 123, 255, 0.1);
+}
+
+.toggle-password-visibility:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
 }
