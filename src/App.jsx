@@ -6,6 +6,7 @@ import Login from './componentes/login.jsx';
 import Register from './componentes/register.jsx';
 import LineaPorLinea from './componentes/superimportantcomponent.jsx';
 import NotesManager from './componentes/notes.jsx';
+import NotesManager1 from './componentes/Notedisplay1.jsx';
 
 // HomePage now relies only on isLoggedIn status, not username for display
 const HomePage = ({ isLoggedIn }) => (
@@ -47,7 +48,7 @@ const NotFoundPage = () => (
 
 const NotesPage = () => (
     <div className="notes">
-        <NotesManager />
+        <NotesManager1 />
     </div>
 );
 

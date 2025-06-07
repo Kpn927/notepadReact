@@ -29,6 +29,7 @@ export default function NotesManager() {
                     throw new Error(`HTTP error! Estado: ${response.status}: ${errorData.message || 'ERROR desconocido'}`);
                 }
                 const data = await response.json();
+                console.log("Datos recibidos del backend (fetchNotes):", data);
 
                 if (!Array.isArray(data)) {
                     setError('La respuesta del servidor no es un formato de lista de notas válido.');
@@ -119,7 +120,6 @@ export default function NotesManager() {
     };
 
     const handleSaveEdit = async (id) => {
-
         const noteToSave = notes.find(note => (note.id === id));
         if (!noteToSave || !noteToSave.editingContent.trim()) {
             setError('Contenido de la nota no puede ser vacío.');
@@ -231,49 +231,20 @@ export default function NotesManager() {
                 {notes.length === 0 && !loading && !error && (
                     <p className="no-notes-message">No hay notas, añade una arriba!</p>
                 )}
-                {notes.map((note) => {
-                    const noteIdToUse = note.id;
-
-                    if (noteIdToUse === undefined || noteIdToUse === null) {
-                        console.warn('Nota sin ID válido (null/undefined) encontrada y omitida:', note);
-                        return null;
-                    }
-
-                    return (
-                        <div key={noteIdToUse} className="note-item">
-                            {editingNoteId === noteIdToUse ? (
-                                <div className="edit-mode">
-                                    <textarea
-                                        value={note.editingContent}
-                                        onChange={(e) => handleEditingContentChange(noteIdToUse, e.target.value)}
-                                        rows="3"
-                                        disabled={loading}
-                                    ></textarea>
-                                    <div className="edit-actions">
-                                        <button onClick={() => handleSaveEdit(noteIdToUse)} disabled={loading}>
-                                            Save
-                                        </button>
-                                        <button onClick={() => handleCancelEdit(noteIdToUse)} disabled={loading}>
-                                            Cancel
-                                        </button>
-                                    </div>
-                                </div>
-                            ) : (
-                                <>
-                                    <p className="note-content">{note.content}</p>
-                                    <div className="note-actions">
-                                        <button onClick={() => startEditing(noteIdToUse)} disabled={loading}>
-                                            Edit
-                                        </button>
-                                        <button onClick={() => handleDeleteNote(noteIdToUse)} disabled={loading}>
-                                            Delete
-                                        </button>
-                                    </div>
-                                </>
-                            )}
-                        </div>
-                    );
-                })}
+                {notes.map((note) => (
+                    // Pasamos la nota completa y los handlers al nuevo componente NoteDisplay
+                    <NoteDisplay
+                        key={note.id} // Siempre usar un key único
+                        note={note}
+                        editingNoteId={editingNoteId}
+                        loading={loading}
+                        startEditing={startEditing}
+                        handleEditingContentChange={handleEditingContentChange}
+                        handleSaveEdit={handleSaveEdit}
+                        handleCancelEdit={handleCancelEdit}
+                        handleDeleteNote={handleDeleteNote}
+                    />
+                ))}
             </div>
             {isDeleteModalOpen && (
                 <div className="modal-overlay">
