@@ -5,14 +5,11 @@ export default function NotesManager() {
     const [notes, setNotes] = useState([]);
     const [newNoteContent, setNewNoteContent] = useState('');
     const [editingNoteId, setEditingNoteId] = useState(null);
-    const [editingNoteContent, setEditingNoteContent] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [noteToDeleteId, setNoteToDeleteId] = useState(null);
-
-    const API_URL = 'http://localhost:5000/api/notes';
     const currentUserId = localStorage.getItem('userId');
 
     useEffect(() => {
@@ -32,7 +29,23 @@ export default function NotesManager() {
                     throw new Error(`HTTP error! Estado: ${response.status}: ${errorData.message || 'ERROR desconocido'}`);
                 }
                 const data = await response.json();
-                setNotes(data);
+
+                if (!Array.isArray(data)) {
+                    setError('La respuesta del servidor no es un formato de lista de notas válido.');
+                    console.error('La respuesta del servidor no es un array:', data);
+                    setNotes([]);
+                    return;
+                }
+
+                const validNotes = data.filter(note =>
+                    note && typeof note === 'object' && note.notas_id !== undefined && (note.content !== undefined)
+                ).map(note => ({
+                    id: note.notas_id,
+                    content: note.content,
+                    editingContent: note.content
+                }));
+                setNotes(validNotes);
+
             } catch (err) {
                 console.error('Error haciendo el fetch:', err);
                 setError(`intento fallido de cargar las notas: ${err.message}. Intenta de nuevo.`);
@@ -62,7 +75,7 @@ export default function NotesManager() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ content: newNoteContent, user_id: currentUserId }),
+                body: JSON.stringify({ content: newNoteContent, userId: currentUserId }),
             });
 
             if (!response.ok) {
@@ -71,8 +84,20 @@ export default function NotesManager() {
             }
 
             const addedNote = await response.json();
-            setNotes((prevNotes) => [...prevNotes, addedNote]);
-            setNewNoteContent('');
+            console.log("Nota añadida recibida del backend (handleAddNote):", addedNote);
+
+            if (addedNote && addedNote.notas_id !== undefined && addedNote.content !== undefined) {
+                setNotes((prevNotes) => [...prevNotes, {
+                    id: addedNote.notas_id,
+                    content: addedNote.content,
+                    editingContent: addedNote.content
+                }]);
+                setNewNoteContent('');
+            } else {
+                setError('La nota devuelta por el servidor no tiene un ID válido (notas_id) o contenido.');
+                console.error('Nota devuelta por el servidor sin ID o contenido válido:', addedNote);
+            }
+
         } catch (err) {
             console.error('Error añadiendo la nota:', err);
             setError(`Fallo al crear la nota: ${err.message}. Por favor, intenta de nuevo.`);
@@ -81,13 +106,22 @@ export default function NotesManager() {
         }
     };
 
-    const startEditing = (note) => {
-        setEditingNoteId(note.id);
-        setEditingNoteContent(note.content);
+    const startEditing = (noteId) => {
+        setEditingNoteId(noteId);
+    };
+
+    const handleEditingContentChange = (noteId, newContent) => {
+        setNotes((prevNotes) =>
+            prevNotes.map((note) =>
+                (note.id === noteId) ? { ...note, editingContent: newContent } : note
+            )
+        );
     };
 
     const handleSaveEdit = async (id) => {
-        if (!editingNoteContent.trim()) {
+
+        const noteToSave = notes.find(note => (note.id === id));
+        if (!noteToSave || !noteToSave.editingContent.trim()) {
             setError('Contenido de la nota no puede ser vacío.');
             return;
         }
@@ -100,7 +134,7 @@ export default function NotesManager() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ content: editingNoteContent }),
+                body: JSON.stringify({ content: noteToSave.editingContent }),
             });
 
             if (!response.ok) {
@@ -110,28 +144,31 @@ export default function NotesManager() {
 
             setNotes((prevNotes) =>
                 prevNotes.map((note) =>
-                    note.id === id ? { ...note, content: editingNoteContent } : note
+                    (note.id === id) ? { ...note, content: note.editingContent } : note
                 )
             );
             setEditingNoteId(null);
-            setEditingNoteContent('');
         } catch (err) {
             console.error('Error guardando la nota:', err);
-            setError(`Fallido a crear la nota: ${err.message}. Por favor intenta de nuevo.`);
+            setError(`Fallido a guardar la nota: ${err.message}. Por favor intenta de nuevo.`);
         } finally {
             setLoading(false);
         }
     };
 
-    const handleCancelEdit = () => {
+    const handleCancelEdit = (noteId) => {
         setEditingNoteId(null);
-        setEditingNoteContent('');
+        setNotes((prevNotes) =>
+            prevNotes.map((note) =>
+                (note.id === noteId) ? { ...note, editingContent: note.content } : note
+            )
+        );
         setError('');
     };
 
     const handleDeleteNote = (id) => {
         setNoteToDeleteId(id);
-        setIsDeleteModalOpen(true); 
+        setIsDeleteModalOpen(true);
     };
 
     const confirmDelete = async () => {
@@ -154,7 +191,7 @@ export default function NotesManager() {
                 throw new Error(`HTTP error! estado: ${response.status}: ${errorData.message || 'ERROR desconocido'}`);
             }
 
-            setNotes((prevNotes) => prevNotes.filter((note) => note.id !== noteToDeleteId));
+            setNotes((prevNotes) => prevNotes.filter((note) => (note.id !== noteToDeleteId)));
             setNoteToDeleteId(null);
         } catch (err) {
             console.error('Error deleting note:', err);
@@ -194,40 +231,49 @@ export default function NotesManager() {
                 {notes.length === 0 && !loading && !error && (
                     <p className="no-notes-message">No hay notas, añade una arriba!</p>
                 )}
-                {notes.map((note) => (
-                    <div key={note.id} className="note-item">
-                        {editingNoteId === note.id ? (
-                            <div className="edit-mode">
-                                <textarea
-                                    value={editingNoteContent}
-                                    onChange={(e) => setEditingNoteContent(e.target.value)}
-                                    rows="3"
-                                    disabled={loading}
-                                ></textarea>
-                                <div className="edit-actions">
-                                    <button onClick={() => handleSaveEdit(note.id)} disabled={loading}>
-                                        Save
-                                    </button>
-                                    <button onClick={handleCancelEdit} disabled={loading}>
-                                        Cancel
-                                    </button>
+                {notes.map((note) => {
+                    const noteIdToUse = note.id;
+
+                    if (noteIdToUse === undefined || noteIdToUse === null) {
+                        console.warn('Nota sin ID válido (null/undefined) encontrada y omitida:', note);
+                        return null;
+                    }
+
+                    return (
+                        <div key={noteIdToUse} className="note-item">
+                            {editingNoteId === noteIdToUse ? (
+                                <div className="edit-mode">
+                                    <textarea
+                                        value={note.editingContent}
+                                        onChange={(e) => handleEditingContentChange(noteIdToUse, e.target.value)}
+                                        rows="3"
+                                        disabled={loading}
+                                    ></textarea>
+                                    <div className="edit-actions">
+                                        <button onClick={() => handleSaveEdit(noteIdToUse)} disabled={loading}>
+                                            Save
+                                        </button>
+                                        <button onClick={() => handleCancelEdit(noteIdToUse)} disabled={loading}>
+                                            Cancel
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        ) : (
-                            <>
-                                <p className="note-content">{note.content}</p>
-                                <div className="note-actions">
-                                    <button onClick={() => startEditing(note)} disabled={loading}>
-                                        Edit
-                                    </button>
-                                    <button onClick={() => handleDeleteNote(note.id)} disabled={loading}>
-                                        Delete
-                                    </button>
-                                </div>
-                            </>
-                        )}
-                    </div>
-                ))}
+                            ) : (
+                                <>
+                                    <p className="note-content">{note.content}</p>
+                                    <div className="note-actions">
+                                        <button onClick={() => startEditing(noteIdToUse)} disabled={loading}>
+                                            Edit
+                                        </button>
+                                        <button onClick={() => handleDeleteNote(noteIdToUse)} disabled={loading}>
+                                            Delete
+                                        </button>
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    );
+                })}
             </div>
             {isDeleteModalOpen && (
                 <div className="modal-overlay">

@@ -43,19 +43,15 @@ app.post('/api/register', async (req, res) => {
     return res.status(400).json({ message: 'Username, correo y contraseña son requeridos.' });
   }
 
-
   try {
-
     const existingUser = await pool.query('SELECT * FROM users WHERE users_em = $1 OR users_us = $2', [email, username]);
 
     if (existingUser.rows.length > 0) {
-
       const userFound = existingUser.rows[0];
 
       if (userFound.users_em === email) {
         console.error(`Registro Error: Usuario con email '${email}' ya existe.`);
         return res.status(409).json({ message: 'Ya existe un usuario con este correo electrónico.' });
-
       } else if (userFound.users_us === username) {
         console.error(`Registro Error: Usuario con username '${username}' ya existe.`);
         return res.status(409).json({ message: 'Ya existe un usuario con este nombre de usuario.' });
@@ -105,15 +101,15 @@ app.post('/api/login', async (req, res) => {
 });
 
 app.post('/api/notes', async (req, res) => {
-    const { content, user_id } = req.body;
-    console.log('Datos recibidos para agregar nota:', { content, user_id });
+    const { content, userId } = req.body; // Cambiado user_id a userId para coincidir con el frontend
+    console.log('Datos recibidos para agregar nota:', { content, userId });
 
     if (!content || content.trim() === '') {
         console.error('Error al agregar nota: El contenido de la nota no puede estar vacío.');
         return res.status(400).json({ message: 'El contenido de la nota no puede estar vacío.' });
     }
 
-    if (!user_id) {
+    if (!userId) { // Ahora usando userId
         console.error('Error al agregar nota: El ID de usuario es requerido.');
         return res.status(400).json({ message: 'El ID de usuario es requerido.' });
     }
@@ -121,7 +117,7 @@ app.post('/api/notes', async (req, res) => {
     try {
         const result = await pool.query(
             'INSERT INTO notas (notas_ct, user_id) VALUES ($1, $2) RETURNING notas_ct AS content, user_id, notas_id',
-            [content, user_id]
+            [content, userId] // Ahora usando userId
         );
 
         const newNote = result.rows[0];
@@ -143,11 +139,12 @@ app.get('/api/notes', async (req, res) => {
     }
     
     try {
-      const result = await pool.query('SELECT * FROM notas WHERE user_id = $1', [userId]);
+      const result = await pool.query('SELECT notas_ct, user_id, notas_id FROM notas WHERE user_id = $1', [userId]);
 
       const notes = result.rows.map(row => ({
         content: row.notas_ct,
-        user_id: row.user_id
+        user_id: row.user_id, 
+        notas_id: row.notas_id // Aseguramos que notas_id se envía
       }));
       
       console.log('Solicitud para obtener notas para el UserID:', userId);
@@ -158,3 +155,64 @@ app.get('/api/notes', async (req, res) => {
         res.status(500).json({ message: 'Error interno del servidor al obtener notas.' });
     }
 });
+
+app.put('/api/notes/:id', async (req, res) => {
+    const { id } = req.params;
+    const { content } = req.body;
+
+    if (!content || content.trim() === '') {
+        console.error('Error al actualizar nota: El contenido de la nota no puede estar vacío.');
+        return res.status(400).json({ message: 'El contenido de la nota no puede estar vacío.' });
+    }
+
+    if (!id) {
+        console.error('Error al actualizar nota: El ID de la nota es requerido.');
+        return res.status(400).json({ message: 'El ID de la nota es requerido.' });
+    }
+
+    try {
+        const result = await pool.query(
+            'UPDATE notas SET notas_ct = $1 WHERE notas_id = $2 RETURNING notas_ct AS content, notas_id',
+            [content, id]
+        );
+
+        if (result.rows.length === 0) {
+            console.error(`Nota no encontrada con ID: ${id}`);
+            return res.status(404).json({ message: 'Nota no encontrada.' });
+        }
+
+        console.log('Nota actualizada exitosamente:', result.rows[0]);
+        res.status(200).json(result.rows[0]);
+
+    } catch (error) {
+        console.error('Error al actualizar nota:', error);
+        res.status(500).json({ message: 'Error interno del servidor al actualizar nota.' });
+    }
+});
+
+app.delete('/api/notes/:id', async (req, res) => {
+    const { id } = req.params;
+    console.log('Solicitud para eliminar nota con ID:', id);
+
+    if (!id) {
+        console.error('Error al eliminar nota: El ID de la nota es requerido.');
+        return res.status(400).json({ message: 'El ID de la nota es requerido.' });
+    }
+
+    try {
+        const result = await pool.query('DELETE FROM notas WHERE notas_id = $1 RETURNING notas_id', [id]);
+
+        if (result.rows.length === 0) {
+            console.error(`Nota no encontrada con ID: ${id}`);
+            return res.status(404).json({ message: 'Nota no encontrada.' });
+        }
+
+        console.log('Nota eliminada exitosamente:', result.rows[0]);
+        res.status(200).json({ message: 'Nota eliminada exitosamente!', deletedId: result.rows[0].notas_id });
+
+    } catch (error) {
+        console.error('Error al eliminar nota:', error);
+        res.status(500).json({ message: 'Error interno del servidor al eliminar nota.' });
+    }
+});
+
