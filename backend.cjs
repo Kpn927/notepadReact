@@ -101,7 +101,7 @@ app.post('/api/login', async (req, res) => {
 });
 
 app.post('/api/notes', async (req, res) => {
-    const { content, userId } = req.body; // Cambiado user_id a userId para coincidir con el frontend
+    const { content, userId } = req.body;
     console.log('Datos recibidos para agregar nota:', { content, userId });
 
     if (!content || content.trim() === '') {
@@ -117,7 +117,7 @@ app.post('/api/notes', async (req, res) => {
     try {
         const result = await pool.query(
             'INSERT INTO notas (notas_ct, user_id) VALUES ($1, $2) RETURNING notas_ct AS content, user_id, notas_id',
-            [content, userId] // Ahora usando userId
+            [content, userId]
         );
 
         const newNote = result.rows[0];
@@ -144,7 +144,7 @@ app.get('/api/notes', async (req, res) => {
       const notes = result.rows.map(row => ({
         content: row.notas_ct,
         user_id: row.user_id, 
-        notas_id: row.notas_id // Aseguramos que notas_id se envía
+        notas_id: row.notas_id
       }));
       
       console.log('Solicitud para obtener notas para el UserID:', userId);

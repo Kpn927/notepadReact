@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import '../componentescss/Notedisplay1.css'; // Asegúrate de que esta ruta sea correcta
+import '../componentescss/Notedisplay1.css';
 
-const MAX_NOTE_LENGTH = 200; // Define la longitud máxima de caracteres para una nota
+const MAX_NOTE_LENGTH = 200;
 
 export default function NotesManager1() {
     const [notes, setNotes] = useState([]);
@@ -9,12 +9,10 @@ export default function NotesManager1() {
     const [editingNoteId, setEditingNoteId] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [noteToDeleteId, setNoteToDeleteId] = useState(null);
-
     const [isNotePopupOpen, setIsNotePopupOpen] = useState(false);
-    const [selectedNote, setSelectedNote] = useState(null); // Contiene la nota completa para el popup
+    const [selectedNote, setSelectedNote] = useState(null);
 
     const currentUserId = localStorage.getItem('userId');
 
@@ -49,7 +47,7 @@ export default function NotesManager1() {
                 ).map(note => ({
                     id: note.notas_id,
                     content: note.content,
-                    editingContent: note.content // Se usa para la edición
+                    editingContent: note.content
                 }));
                 setNotes(validNotes);
 
@@ -120,10 +118,9 @@ export default function NotesManager1() {
 
     const startEditing = (noteId) => {
         setEditingNoteId(noteId);
-        // Si la nota se está editando en el popup, cerramos el popup para evitar duplicidad de editores
         if (isNotePopupOpen && selectedNote && selectedNote.id === noteId) {
-            setIsNotePopupOpen(false); // Cierra el popup para que la edición ocurra en la tarjeta principal
-            setSelectedNote(null); // Deselecciona la nota
+            setIsNotePopupOpen(false);
+            setSelectedNote(null);
         }
     };
 
@@ -133,8 +130,6 @@ export default function NotesManager1() {
                 (note.id === noteId) ? { ...note, editingContent: newContent } : note
             )
         );
-        // Si estamos editando la nota seleccionada en el popup, también actualizamos su contenido de edición
-        // Esto es importante para que el textarea del popup refleje los cambios en tiempo real
         if (selectedNote && selectedNote.id === noteId) {
             setSelectedNote(prevSelectedNote => ({ ...prevSelectedNote, editingContent: newContent }));
         }
@@ -173,7 +168,6 @@ export default function NotesManager1() {
                 )
             );
             setEditingNoteId(null);
-            // Actualizar la nota en el popup si es la que se acaba de guardar
             if (selectedNote && selectedNote.id === id) {
                 setSelectedNote(prevSelectedNote => ({
                     ...prevSelectedNote,
@@ -196,7 +190,6 @@ export default function NotesManager1() {
                 (note.id === noteId) ? { ...note, editingContent: note.content } : note
             )
         );
-        // Revertir el contenido de edición en el popup si se estaba editando esa nota
         if (selectedNote && selectedNote.id === noteId) {
             setSelectedNote(prevSelectedNote => ({ ...prevSelectedNote, editingContent: prevSelectedNote.content }));
         }
@@ -230,7 +223,6 @@ export default function NotesManager1() {
 
             setNotes((prevNotes) => prevNotes.filter((note) => (note.id !== noteToDeleteId)));
             setNoteToDeleteId(null);
-            // Si la nota eliminada era la que estaba en el popup, cierra el popup
             if (selectedNote && selectedNote.id === noteToDeleteId) {
                 closeNotePopup();
             }
@@ -249,27 +241,26 @@ export default function NotesManager1() {
     };
 
     const handleViewNote = (note) => {
-        setSelectedNote({ ...note }); // Crear una copia para evitar mutaciones directas del estado 'notes'
+        setSelectedNote({ ...note });
         setIsNotePopupOpen(true);
-        setEditingNoteId(null); // Asegúrate de que no haya una nota en edición en la tarjeta principal
+        setEditingNoteId(null);
     };
 
     const closeNotePopup = () => {
         setIsNotePopupOpen(false);
         setSelectedNote(null);
-        setEditingNoteId(null); // También sal del modo de edición si el popup se cierra
-        setError(''); // Limpia cualquier error al cerrar el popup
+        setEditingNoteId(null);
+        setError('');
     };
 
     const handlePopupEdit = () => {
         if (selectedNote) {
             setEditingNoteId(selectedNote.id);
-            // Aseguramos que el selectedNote.editingContent esté sincronizado para la edición en el popup
             const currentNoteInState = notes.find(n => n.id === selectedNote.id);
             if (currentNoteInState) {
                 setSelectedNote(prevSelectedNote => ({
                     ...prevSelectedNote,
-                    editingContent: currentNoteInState.editingContent // Usa el editingContent del estado principal
+                    editingContent: currentNoteInState.editingContent
                 }));
             }
         }
@@ -278,14 +269,12 @@ export default function NotesManager1() {
     const handlePopupDelete = () => {
         if (selectedNote) {
             handleDeleteNote(selectedNote.id);
-            // closeNotePopup(); // La eliminación confirmada cerrará el popup
         }
     };
 
-    // Función para truncar el contenido para la vista de tarjeta
     const truncateContent = (content, maxLength) => {
         if (!content) return '';
-        const previewLength = maxLength / 2; // Mostrar aproximadamente la mitad de la longitud máxima en la tarjeta
+        const previewLength = maxLength / 2;
         if (content.length <= previewLength) return content;
         return content.substring(0, previewLength) + '...';
     };
@@ -293,7 +282,6 @@ export default function NotesManager1() {
 
     return (
         <div className="notes-app-container">
-            {/* Sección de añadir notas */}
             <div className="add-note-section">
                 <div className="add-note-header">
                     <span className="add-note-icon">T</span>
@@ -320,8 +308,8 @@ export default function NotesManager1() {
                         rows="3"
                         disabled={loading}
                         className="add-note-textarea"
-                        maxLength={MAX_NOTE_LENGTH} // Límite de caracteres en el textarea
-                        wrap="soft" // Asegura el ajuste de línea para el textarea
+                        maxLength={MAX_NOTE_LENGTH}
+                        wrap="soft"
                     ></textarea>
                     <div className="char-counter">
                         {newNoteContent.length} / {MAX_NOTE_LENGTH}
@@ -335,8 +323,6 @@ export default function NotesManager1() {
                     </button>
                 </form>
             </div>
-
-            {/* Lista de Notas */}
             <div className="notes-grid-container">
                 {notes.length === 0 && !loading && !error && (
                     <p className="no-notes-message">No hay notas, ¡añade una arriba!</p>
@@ -357,11 +343,11 @@ export default function NotesManager1() {
                                     <textarea
                                         value={note.editingContent || ''}
                                         onChange={(e) => handleEditingContentChange(noteIdToUse, e.target.value)}
-                                        rows="4" // Se mantiene fijo para la tarjeta, la expansión es en el popup
+                                        rows="4"
                                         disabled={loading}
                                         className="note-edit-textarea"
-                                        maxLength={MAX_NOTE_LENGTH} // Límite de caracteres en el textarea de edición
-                                        wrap="soft" // Asegura el ajuste de línea para el textarea
+                                        maxLength={MAX_NOTE_LENGTH}
+                                        wrap="soft"
                                     ></textarea>
                                     <div className="char-counter">
                                         {note.editingContent.length} / {MAX_NOTE_LENGTH}
@@ -385,7 +371,6 @@ export default function NotesManager1() {
                                 </div>
                             ) : (
                                 <div className="note-display-mode">
-                                    {/* Contenido truncado para la vista de tarjeta */}
                                     <p className="note-content-display">
                                         {truncateContent(note.content, MAX_NOTE_LENGTH)}
                                     </p>
@@ -419,7 +404,6 @@ export default function NotesManager1() {
                 })}
             </div>
 
-            {/* Delete Confirmation Modal */}
             {isDeleteModalOpen && (
                 <div className="modal-overlay">
                     <div className="modal-content">
@@ -445,31 +429,27 @@ export default function NotesManager1() {
                 </div>
             )}
 
-            {/* Note View Popup Modal */}
             {isNotePopupOpen && selectedNote && (
                 <div className="modal-overlay">
                     <div className="note-popup-content">
                         <h2 className="note-popup-title">Nota Completa</h2>
                         {editingNoteId === selectedNote.id ? (
-                            <div className="note-popup-edit-mode"> {/* Nueva clase aquí */}
+                            <div className="note-popup-edit-mode">
                                 <textarea
-                                    // Cuando se edita en el popup, debemos tomar el editingContent de la nota que está en el array 'notes'
-                                    // ya que selectedNote es una copia.
                                     value={notes.find(n => n.id === selectedNote.id)?.editingContent || ''}
                                     onChange={(e) => handleEditingContentChange(selectedNote.id, e.target.value)}
-                                    // Cálculo de rows dinámico para que el textarea se ajuste a la altura del contenido
                                     rows={
                                         Math.max(5, (notes.find(n => n.id === selectedNote.id)?.editingContent || '').split('\n').length + 2)
                                     }
                                     disabled={loading}
                                     className="note-popup-textarea"
                                     maxLength={MAX_NOTE_LENGTH}
-                                    wrap="soft" // Asegura el ajuste de línea para el textarea
+                                    wrap="soft"
                                 ></textarea>
                                 <div className="char-counter">
                                     { (notes.find(n => n.id === selectedNote.id)?.editingContent || '').length } / {MAX_NOTE_LENGTH}
                                 </div>
-                                <div className="note-popup-actions-group"> {/* Nueva clase aquí */}
+                                <div className="note-popup-actions-group">
                                     <button
                                         onClick={() => handleSaveEdit(selectedNote.id)}
                                         disabled={loading}
@@ -487,9 +467,9 @@ export default function NotesManager1() {
                                 </div>
                             </div>
                         ) : (
-                            <div className="note-popup-display-mode"> {/* Nueva clase aquí */}
+                            <div className="note-popup-display-mode">
                                 <p className="note-popup-text">{selectedNote.content}</p>
-                                <div className="note-popup-actions-group"> {/* Nueva clase aquí */}
+                                <div className="note-popup-actions-group">
                                     <button className="note-button-edit" onClick={handlePopupEdit} disabled={loading}>
                                         Editar
                                     </button>

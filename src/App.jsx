@@ -8,7 +8,6 @@ import LineaPorLinea from './componentes/superimportantcomponent.jsx';
 import NotesManager from './componentes/notes.jsx';
 import NotesManager1 from './componentes/Notedisplay1.jsx';
 
-// HomePage now relies only on isLoggedIn status, not username for display
 const HomePage = ({ isLoggedIn }) => (
     <div className="home">
         <div className='welcometext'>

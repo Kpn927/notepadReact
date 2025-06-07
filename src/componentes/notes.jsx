@@ -232,9 +232,8 @@ export default function NotesManager() {
                     <p className="no-notes-message">No hay notas, añade una arriba!</p>
                 )}
                 {notes.map((note) => (
-                    // Pasamos la nota completa y los handlers al nuevo componente NoteDisplay
                     <NoteDisplay
-                        key={note.id} // Siempre usar un key único
+                        key={note.id}
                         note={note}
                         editingNoteId={editingNoteId}
                         loading={loading}
